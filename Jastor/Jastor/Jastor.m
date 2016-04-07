@@ -11,7 +11,7 @@ Class nsDictionaryClass;
 Class nsArrayClass;
 
 + (id)objectFromDictionary:(NSDictionary*)dictionary {
-    id item = [[[self alloc] initWithDictionary:dictionary] autorelease];
+    id item = [[self alloc] initWithDictionary:dictionary];
     return item;
 }
 
@@ -39,7 +39,7 @@ Class nsArrayClass;
             // handle dictionary
             if ([value isKindOfClass:nsDictionaryClass]) {
                 Class klass = [JastorRuntimeHelper propertyClassForPropertyName:key ofClass:[self class]];
-                value = [[[klass alloc] initWithDictionary:value] autorelease];
+                value = [[klass alloc] initWithDictionary:value];
             }
             // handle array
             else if ([value isKindOfClass:nsArrayClass]) {
@@ -55,7 +55,7 @@ Class nsArrayClass;
                         if ([arrayItemType isSubclassOfClass:[NSDictionary class]]) {
                             [childObjects addObject:child];
                         } else if ([arrayItemType isSubclassOfClass:[Jastor class]]) {
-                            Jastor *childDTO = [[[arrayItemType alloc] initWithDictionary:child] autorelease];
+                            Jastor *childDTO = [[arrayItemType alloc] initWithDictionary:child];
                             [childObjects addObject:childDTO];
                         }
                     } else {
@@ -82,12 +82,6 @@ Class nsArrayClass;
 
 - (void)dealloc {
 	self.objectId = nil;
-	
-//	for (NSString *key in [JastorRuntimeHelper propertyNames:[self class]]) {
-//		//[self setValue:nil forKey:key];
-//	}
-	
-	[super dealloc];
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder {
@@ -144,7 +138,7 @@ Class nsArrayClass;
 
 - (NSDictionary *)map {
 	NSArray *properties = [JastorRuntimeHelper propertyNames:[self class]];
-	NSMutableDictionary *mapDictionary = [[[NSMutableDictionary alloc] initWithCapacity:properties.count] autorelease];
+	NSMutableDictionary *mapDictionary = [[NSMutableDictionary alloc] initWithCapacity:properties.count];
 	for (NSString *property in properties) {
 		[mapDictionary setObject:property forKey:property];
 	}
