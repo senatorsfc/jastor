@@ -13,6 +13,8 @@
 
 - (id)initWithDictionary:(NSDictionary *)dictionary;
 
+- (id)initWithDictionary:(NSDictionary *)dictionary arrayClass:(Class)arrayClass;
+
 - (NSMutableDictionary *)toDictionary;
 
 - (NSDictionary *)map;

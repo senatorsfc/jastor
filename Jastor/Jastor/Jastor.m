@@ -16,61 +16,68 @@ Class nsArrayClass;
 }
 
 - (id)initWithDictionary:(NSDictionary *)dictionary {
-	if (!nsDictionaryClass) nsDictionaryClass = [NSDictionary class];
-	if (!nsArrayClass) nsArrayClass = [NSArray class];
-	
-	if ((self = [super init])) {
-		for (NSString *key in [JastorRuntimeHelper propertyNames:[self class]]) {
-			
-			id value = [dictionary valueForKey:[[self map] valueForKey:key]];
-			
-			if (value == [NSNull null] || value == nil) {
+    return [self initWithDictionary:dictionary arrayClass:NULL];
+}
+
+- (id)initWithDictionary:(NSDictionary *)dictionary arrayClass:(Class)arrayClass{
+    if (!nsDictionaryClass) nsDictionaryClass = [NSDictionary class];
+    if (!nsArrayClass) nsArrayClass = [NSArray class];
+    
+    if ((self = [super init])) {
+        for (NSString *key in [JastorRuntimeHelper propertyNames:[self class]]) {
+            
+            id value = [dictionary valueForKey:[[self map] valueForKey:key]];
+            
+            if (value == [NSNull null] || value == nil) {
                 continue;
             }
             
             if ([JastorRuntimeHelper isPropertyReadOnly:[self class] propertyName:key]) {
                 continue;
             }
-			
-			// handle dictionary
-			if ([value isKindOfClass:nsDictionaryClass]) {
-				Class klass = [JastorRuntimeHelper propertyClassForPropertyName:key ofClass:[self class]];
-				value = [[[klass alloc] initWithDictionary:value] autorelease];
-			}
-			// handle array
-			else if ([value isKindOfClass:nsArrayClass]) {
-				
-				NSMutableArray *childObjects = [NSMutableArray arrayWithCapacity:[(NSArray*)value count]];
-				
-				for (id child in value) {
+            
+            // handle dictionary
+            if ([value isKindOfClass:nsDictionaryClass]) {
+                Class klass = [JastorRuntimeHelper propertyClassForPropertyName:key ofClass:[self class]];
+                value = [[[klass alloc] initWithDictionary:value] autorelease];
+            }
+            // handle array
+            else if ([value isKindOfClass:nsArrayClass]) {
+                
+                NSMutableArray *childObjects = [NSMutableArray arrayWithCapacity:[(NSArray*)value count]];
+                
+                for (id child in value) {
                     if ([[child class] isSubclassOfClass:nsDictionaryClass]) {
-                        Class arrayItemType = [[self class] performSelector:NSSelectorFromString([NSString stringWithFormat:@"%@_class", key])];
+                        Class arrayItemType;
+                        if(arrayClass == NULL) arrayItemType = [[self class] performSelector:NSSelectorFromString([NSString stringWithFormat:@"%@_class", key])];
+                        else arrayItemType = arrayClass;
+                        
                         if ([arrayItemType isSubclassOfClass:[NSDictionary class]]) {
                             [childObjects addObject:child];
                         } else if ([arrayItemType isSubclassOfClass:[Jastor class]]) {
                             Jastor *childDTO = [[[arrayItemType alloc] initWithDictionary:child] autorelease];
                             [childObjects addObject:childDTO];
                         }
-					} else {
-						[childObjects addObject:child];
-					}
-				}
-				
-				value = childObjects;
-			}
-			// handle all others
-			[self setValue:value forKey:key];
-		}
-		
-		id objectIdValue;
-		if ((objectIdValue = [dictionary objectForKey:idPropertyName]) && objectIdValue != [NSNull null]) {
-			if (![objectIdValue isKindOfClass:[NSString class]]) {
-				objectIdValue = [NSString stringWithFormat:@"%@", objectIdValue];
-			}
-			[self setValue:objectIdValue forKey:idPropertyNameOnObject];
-		}
-	}
-	return self;	
+                    } else {
+                        [childObjects addObject:child];
+                    }
+                }
+                
+                value = childObjects;
+            }
+            // handle all others
+            [self setValue:value forKey:key];
+        }
+        
+        id objectIdValue;
+        if ((objectIdValue = [dictionary objectForKey:idPropertyName]) && objectIdValue != [NSNull null]) {
+            if (![objectIdValue isKindOfClass:[NSString class]]) {
+                objectIdValue = [NSString stringWithFormat:@"%@", objectIdValue];
+            }
+            [self setValue:objectIdValue forKey:idPropertyNameOnObject];
+        }
+    }
+    return self;
 }
 
 - (void)dealloc {
