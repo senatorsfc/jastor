@@ -49,8 +49,13 @@ Class nsArrayClass;
                 for (id child in value) {
                     if ([[child class] isSubclassOfClass:nsDictionaryClass]) {
                         Class arrayItemType;
-                        if(arrayClass == NULL) arrayItemType = [[self class] performSelector:NSSelectorFromString([NSString stringWithFormat:@"%@_class", key])];
-                        else arrayItemType = arrayClass;
+                        
+                        if(arrayClass == NULL) {
+                            if ([self respondsToSelector:NSSelectorFromString([NSString stringWithFormat:@"%@_instance_class", key])]) {
+                                arrayItemType = [self performSelector:NSSelectorFromString([NSString stringWithFormat:@"%@_instance_class", key])];
+                            }
+                            arrayItemType = [[self class] performSelector:NSSelectorFromString([NSString stringWithFormat:@"%@_class", key])];
+                        } else arrayItemType = arrayClass;
                         
                         if ([arrayItemType isSubclassOfClass:[NSDictionary class]]) {
                             [childObjects addObject:child];
