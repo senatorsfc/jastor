@@ -51,8 +51,8 @@ Class nsArrayClass;
                         Class arrayItemType;
                         
                         if(arrayClass == NULL) {
-                            if ([self respondsToSelector:NSSelectorFromString([NSString stringWithFormat:@"%@_instance_class", key])]) {
-                                arrayItemType = [self performSelector:NSSelectorFromString([NSString stringWithFormat:@"%@_instance_class", key])];
+                            if ([[self class] respondsToSelector:NSSelectorFromString([NSString stringWithFormat:@"%@_parsed_class:", key])]) {
+                                arrayItemType = [[self class] performSelector:NSSelectorFromString([NSString stringWithFormat:@"%@_parsed_class:", key]) withObject:dictionary];
                             }
                             if(arrayItemType == NULL)
                                 arrayItemType = [[self class] performSelector:NSSelectorFromString([NSString stringWithFormat:@"%@_class", key])];
