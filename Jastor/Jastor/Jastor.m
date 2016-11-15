@@ -24,9 +24,10 @@ Class nsArrayClass;
     if (!nsArrayClass) nsArrayClass = [NSArray class];
     
     if ((self = [super init])) {
+        NSDictionary *map = [self map];
         for (NSString *key in [JastorRuntimeHelper propertyNames:[self class]]) {
             
-            id value = [dictionary valueForKey:[[self map] valueForKey:key]];
+            id value = [dictionary valueForKey:[map valueForKey:key]];
             
             if (value == [NSNull null] || value == nil) {
                 continue;
@@ -125,10 +126,11 @@ Class nsArrayClass;
         [dic setObject:self.objectId forKey:idPropertyName];
     }
 	
+    NSDictionary *map = [self map];
 	for (NSString *key in [JastorRuntimeHelper propertyNames:[self class]]) {
 		id value = [self valueForKey:key];
         if (value && [value isKindOfClass:[Jastor class]]) {
-			[dic setObject:[value toDictionary] forKey:[[self map] valueForKey:key]];
+			[dic setObject:[value toDictionary] forKey:[map valueForKey:key]];
         } else if (value && [value isKindOfClass:[NSArray class]] && ((NSArray*)value).count > 0) {
             id internalValue = [value objectAtIndex:0];
             if (internalValue && [internalValue isKindOfClass:[Jastor class]]) {
@@ -136,12 +138,12 @@ Class nsArrayClass;
                 for (id item in value) {
                     [internalItems addObject:[item toDictionary]];
                 }
-				[dic setObject:internalItems forKey:[[self map] valueForKey:key]];
+				[dic setObject:internalItems forKey:[map valueForKey:key]];
             } else {
-				[dic setObject:value forKey:[[self map] valueForKey:key]];
+				[dic setObject:value forKey:[map valueForKey:key]];
             }
         } else if (value != nil) {
-			[dic setObject:value forKey:[[self map] valueForKey:key]];
+			[dic setObject:value forKey:[map valueForKey:key]];
         }
 	}
     return dic;
