@@ -27,7 +27,8 @@ static NSMutableDictionary *propertyClassByClassAndPropertyName;
     NSArray * attributes = [typeString componentsSeparatedByString:@","];
     NSString * typeAttribute = [attributes objectAtIndex:1];
 
-    return [typeAttribute rangeOfString:@"R"].length > 0;
+    NSRange typeRange = [typeAttribute rangeOfString:@"R"];    
+    return typeRange.length > 0 && typeRange.location == 0;
 }
 
 + (NSArray *)propertyNames:(Class)klass {
